@@ -184,14 +184,12 @@ let controller = (function (budgetCtrl, UICtrl) {
       UICtrl.clearFields();
 
       // 4. Calculate the budget
-      budgetCtrl.calculateBudget();
-      let budget = budgetCtrl.getBudget();
-      UICtrl.displayBudget(budget);
+      updateBudget();
     }
   }
 
   let ctrlDeleteItem = function(event) {
-    let itemID, splitID, type, ID, budget;
+    let itemID, splitID, type, ID;
 
     itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
 
@@ -208,9 +206,14 @@ let controller = (function (budgetCtrl, UICtrl) {
     UICtrl.deleteListItem(itemID);
 
     // 3. update and show new budget
+    updateBudget();
+  }
+
+  let updateBudget = function() {
+    let budget;
     budgetCtrl.calculateBudget();
     budget = budgetCtrl.getBudget();
-    UICtrl.displayBudget(budget);
+    UICtrl.displayBudget(budget);      
   }
 
   return {
