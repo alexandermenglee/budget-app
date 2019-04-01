@@ -134,14 +134,18 @@ let UIController = (function () {
 
       document.querySelector(element).insertAdjacentHTML('beforeend', newHTML);
     },
-    clearFields: function () {
+    deleteListItem: function(selectorID) {
+      let element = document.getElementById(selectorID);
+      element.parentNode.removeChild(element); 
+    }, 
+    clearFields: function() {
       var fields, fieldsArr;
 
       fields = document.querySelectorAll(DOMstrings.inputDescription + ', ' + DOMstrings.inputValue);
       fieldsArr = Array.prototype.slice.call(fields);
       fieldsArr.forEach(curr => curr.value = "");
     },
-    displayBudget: function (obj) {
+    displayBudget: function(obj) {
       document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalIncome.toFixed(2);
       document.querySelector(DOMstrings.expenseLabel).textContent = obj.totalExpenses.toFixed(2);
       document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget.toFixed(2);
@@ -187,25 +191,28 @@ let controller = (function (budgetCtrl, UICtrl) {
   }
 
   let ctrlDeleteItem = function(event) {
-    let itemID, splitID, type, ID;
+    let itemID, splitID, type, ID, budget;
 
     itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
 
     if(itemID) {
       splitID = itemID.split('-');
       type = splitID[0];
-      ID = parseInt(splitID[1]); 
+      ID = parseInt(splitID[1]);
     }
 
     // 1. delete from the data structure
     budgetCtrl.deleteItem(type, ID);
 
     // 2. delete from UI
-    
+    UICtrl.deleteListItem(itemID);
 
     // 3. update and show new budget
-
+    budgetCtrl.calculateBudget();
+    budget = budgetCtrl.getBudget();
+    UICtrl.displayBudget(budget);
   }
+
   return {
     init: function () {
       console.log("Application has started.");
