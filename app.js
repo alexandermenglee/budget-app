@@ -169,6 +169,34 @@ let UIController = (function () {
       document.querySelector(DOMstrings.expenseLabel).textContent = obj.totalExpenses.toFixed(2);
       document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget.toFixed(2);
       document.querySelector(DOMstrings.percentageLabel).textContent = obj.percentage + '%';
+    },
+    displayPercentage: function(percentages) {
+      let fields = document.querySelectorAll(DOMstrings.expensePercentage);
+      // create for each loop for list
+      function nodeListForEach(list, callback) {
+        for(let i = 0; i < list.length; i++) {
+          callback(list[i], i)
+        }
+      }
+      // display 
+      nodeListForEach(fields, (val, i) => {
+        if(percentages[i] > 0) {
+          val.textContent = percentages[i] + "%";
+        } else {
+          val.textContent = "---"; 
+        }
+      });
+    },
+    formatNumbers: function(num) {
+      let numSplit, dec, int;
+      num.Math.abs(num).toFixed(2);
+      numSplit = num.split(',');
+      int = numSplit[0];
+      dec = numSplit[1];
+
+      if(int.length > 3) {
+        int = int.substr(0, int.length - 3) + "," + int.substr(int.length - 3, 3);
+      }
     }
   }
 })();
@@ -245,9 +273,9 @@ let controller = (function (budgetCtrl, UICtrl) {
     // 1. Calculate percentage
     budgetCtrl.calculatePercentage();
     // 2. Read percentage from budgetController
-    let p =budgetCtrl.getPercentages();
+    let percents = budgetCtrl.getPercentages();
     // 3. Update UI with new percentage
-    console.log(p);
+    UICtrl.displayPercentage(percents);
 
   }
 
@@ -264,6 +292,5 @@ let controller = (function (budgetCtrl, UICtrl) {
     }
   }
 })(budgetController, UIController);
-
 
 controller.init();
