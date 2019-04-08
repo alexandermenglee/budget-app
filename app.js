@@ -187,16 +187,19 @@ let UIController = (function () {
         }
       });
     },
-    formatNumbers: function(num) {
+    formatNumbers: function(num, type) {
       let numSplit, dec, int;
-      num.Math.abs(num).toFixed(2);
-      numSplit = num.split(',');
+      num = Math.abs(num).toFixed(2);
+      numSplit = num.split('.');
       int = numSplit[0];
       dec = numSplit[1];
 
+      // int = 4732
       if(int.length > 3) {
-        int = int.substr(0, int.length - 3) + "," + int.substr(int.length - 3, 3);
+        int = int.substr(0, int.length - 3) + "," + int.substr(int.length - 3, int.length);
       }
+
+      return int + "." + dec; 
     }
   }
 })();
@@ -266,7 +269,7 @@ let controller = (function (budgetCtrl, UICtrl) {
     let budget;
     budgetCtrl.calculateBudget();
     budget = budgetCtrl.getBudget();
-    UICtrl.displayBudget(budget);      
+    UICtrl.displayBudget(budget);
   }
 
   function updatePercentage() {
