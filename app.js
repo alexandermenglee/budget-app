@@ -122,7 +122,21 @@ let UIController = (function () {
     budgetLabel: '.budget__value',
     percentageLabel: '.budget__expenses--percentage',
     container: '.container',
-    expensePercentage: '.item__percentage'
+    expensePercentage: '.item__percentage',
+    dateLabel: '.budget__title--month'
+  }
+  function formatNumbers(num, type) {
+    let numSplit, dec, int;
+    num = Math.abs(num).toFixed(2);
+    numSplit = num.split('.');
+    int = numSplit[0];
+    dec = numSplit[1];
+
+    if (int.length > 3) {
+      int = int.substr(0, int.length - 3) + "," + int.substr(int.length - 3, int.length);
+    }
+
+    return (type === "income" ? "+" : "-") + " " + int + "." + dec;
   }
 
   return {
@@ -141,21 +155,22 @@ let UIController = (function () {
 
       if (type === "income") {
         element = DOMstrings.incomeContainer;
-        html = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div ><div class="right clearfix"><div class="item__value">+ %value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div >';
+        html = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div ><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div >';
       } else if (type === "expense") {
         element = DOMstrings.expensesContainer;
-        html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div ><div class="right clearfix"><div class="item__value">- %value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div >';
+        html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div ><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div >';
       }
 
       newHTML = html.replace('%id%', obj.id);
       newHTML = newHTML.replace('%description%', obj.description);
-      newHTML = newHTML.replace('%value%', obj.value);
+      newHTML = newHTML.replace('%value%', formatNumbers(obj.value, type));
+      // newHTML = newHTML.replace('%value%', obj.value);
 
       document.querySelector(element).insertAdjacentHTML('beforeend', newHTML);
     },
     deleteListItem: function(selectorID) {
       let element = document.getElementById(selectorID);
-      element.parentNode.removeChild(element); 
+      element.parentNode.removeChild(element);
     }, 
     clearFields: function() {
       var fields, fieldsArr;
@@ -165,13 +180,17 @@ let UIController = (function () {
       fieldsArr.forEach(curr => curr.value = "");
     },
     displayBudget: function(obj) {
+      let type;
+
+      obj.budget > 0 ? type = "income" : type = "expense";
       document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalIncome.toFixed(2);
       document.querySelector(DOMstrings.expenseLabel).textContent = obj.totalExpenses.toFixed(2);
-      document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget.toFixed(2);
+      document.querySelector(DOMstrings.budgetLabel).textContent = formatNumbers(obj.budget, type);
       document.querySelector(DOMstrings.percentageLabel).textContent = obj.percentage + '%';
     },
     displayPercentage: function(percentages) {
       let fields = document.querySelectorAll(DOMstrings.expensePercentage);
+    
       // create for each loop for list
       function nodeListForEach(list, callback) {
         for(let i = 0; i < list.length; i++) {
@@ -187,19 +206,13 @@ let UIController = (function () {
         }
       });
     },
-    formatNumbers: function(num, type) {
-      let numSplit, dec, int;
-      num = Math.abs(num).toFixed(2);
-      numSplit = num.split('.');
-      int = numSplit[0];
-      dec = numSplit[1];
+    displayDate: function() {
+      let date, months, year;
 
-      // int = 4732
-      if(int.length > 3) {
-        int = int.substr(0, int.length - 3) + "," + int.substr(int.length - 3, int.length);
-      }
-
-      return int + "." + dec; 
+      date = new Date();
+      months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "Octoboer", "November", "Decemter"];
+      year = date.getFullYear();
+      document.querySelector(DOMstrings.dateLabel).textContent = months[date.getMonth()] + " " + year; 
     }
   }
 })();
@@ -292,6 +305,7 @@ let controller = (function (budgetCtrl, UICtrl) {
         percentage: 0
       });
       setupEventListeners();
+      UICtrl.displayDate();
     }
   }
 })(budgetController, UIController);
