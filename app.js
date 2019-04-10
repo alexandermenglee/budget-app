@@ -125,19 +125,27 @@ let UIController = (function () {
     expensePercentage: '.item__percentage',
     dateLabel: '.budget__title--month'
   }
-  function formatNumbers(num, type) {
-    let numSplit, dec, int;
-    num = Math.abs(num).toFixed(2);
-    numSplit = num.split('.');
-    int = numSplit[0];
-    dec = numSplit[1];
 
-    if (int.length > 3) {
-      int = int.substr(0, int.length - 3) + "," + int.substr(int.length - 3, int.length);
-    }
-
-    return (type === "income" ? "+" : "-") + " " + int + "." + dec;
+// create for each loop for list
+function nodeListForEach(list, callback) {
+  for (let i = 0; i < list.length; i++) {
+    callback(list[i], i)
   }
+}
+  
+function formatNumbers(num, type) {
+  let numSplit, dec, int;
+  num = Math.abs(num).toFixed(2);
+  numSplit = num.split('.');
+  int = numSplit[0];
+  dec = numSplit[1];
+
+  if (int.length > 3) {
+    int = int.substr(0, int.length - 3) + "," + int.substr(int.length - 3, int.length);
+  }
+
+  return (type === "income" ? "+" : "-") + " " + int + "." + dec;
+}
 
   return {
     getInput: function () {
@@ -191,12 +199,6 @@ let UIController = (function () {
     displayPercentage: function(percentages) {
       let fields = document.querySelectorAll(DOMstrings.expensePercentage);
     
-      // create for each loop for list
-      function nodeListForEach(list, callback) {
-        for(let i = 0; i < list.length; i++) {
-          callback(list[i], i)
-        }
-      }
       // display 
       nodeListForEach(fields, (val, i) => {
         if(percentages[i] > 0) {
@@ -213,6 +215,16 @@ let UIController = (function () {
       months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "Octoboer", "November", "Decemter"];
       year = date.getFullYear();
       document.querySelector(DOMstrings.dateLabel).textContent = months[date.getMonth()] + " " + year; 
+    },
+    changeType: function() {
+      let fields = document.querySelectorAll(
+        DOMstrings.inputType + ", " +
+        DOMstrings.inputDescription + ", " +
+        DOMstrings.inputValue
+      );
+
+      nodeListForEach(fields, val => val.classList.toggle('red-focus'));
+      document.querySelector(DOMstrings.inputBtn).classList.toggle('red');
     }
   }
 })();
@@ -229,6 +241,7 @@ let controller = (function (budgetCtrl, UICtrl) {
       }
     });
     document.querySelector(DOMStrings.container).addEventListener('click', ctrlDeleteItem);
+    document.querySelector(DOMStrings.inputType).addEventListener('change', UICtrl.changeType);
   }
 
   let ctrlAddItem = function () {
